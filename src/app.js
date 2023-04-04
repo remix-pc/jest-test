@@ -3,6 +3,9 @@ const app = express()
 const mongoose = require('mongoose')
 const user = require('./models/User')
 const bcrypt = require('bcrypt')
+const jwt = require("jsonwebtoken")
+
+let JWTScret = "apperture"
 
 
 
@@ -57,5 +60,45 @@ app.post("/user", async(req, res) => {
     }
 
 })
+
+app.post('/auth', async(req, res) => {
+
+    let {email, password} = req.body
+
+    let user = await User.findOne({"email": email})
+
+    if(user == undefined) {
+        res.statusCode = 403
+        res.json({errors: {email: "E-mail não cadastrado"}})
+        return 
+    }
+
+
+    let isPasswordRight = await bcrypt.compare(password, user.password)
+
+    if(!isPasswordRight){
+        res.statusCode = 403
+        res.json({errors: {password: "Senha incorreta"}})
+        return
+    }
+
+
+    jwt.sign({email, name: user.name, id: user._id}, JWTScret, {expiresIn: '48h'}, (error, token) => {
+        if(error){
+            res.sendStatus(500)
+            console.log(error)
+        }else {
+            res.json({token: token})
+        }
+    })
+
+})
+
+app.delete("/user/:email", async (req, res) => {//Existir apenas no Desenvolvimento de Sistemas
+
+    await User.deleteOne({"email": req.params.email})
+    res.sendStatus(200)
+
+}) 
 
 module.exports = app

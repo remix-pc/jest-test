@@ -13,7 +13,5 @@ test("A aplicação deve responder na porta 3131", () =>{
     }).catch(error =>{
         throw new Error(error)
     })
-
-
     
 })
