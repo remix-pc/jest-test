@@ -11,6 +11,9 @@ test("A aplicação deve responder na porta 3131", () =>{
         let status = res.statusCode
         expect(status).toEqual(200)
     }).catch(error =>{
-        fail(error)
+        throw new Error(error)
     })
+
+
+    
 })
